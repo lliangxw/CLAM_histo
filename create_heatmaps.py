@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(description='Heatmap inference script')
 parser.add_argument('--save_exp_code', type=str, default=None,
                     help='experiment code')
 parser.add_argument('--overlap', type=float, default=None)
-parser.add_argument('--config_file', type=str, default="heatmap_config_template.yaml")
+parser.add_argument('--config_file', type=str, default="heatmap_config_template_0_40.yaml")
 args = parser.parse_args()
 device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -338,7 +338,7 @@ if __name__ == '__main__':
 
         # ##### check if h5_features_file exists ######
 
-        h5_path_original = os.path.join(data_args.feature_dir_h5, slide_id+'.h5')  #### Added
+        # h5_path_original = os.path.join(data_args.feature_dir_h5, slide_id+'.h5')  #### Added
 
         if not os.path.isfile(h5_path) :  ### Modified, original code : if not os.path.isfile(h5_path) :
             _, _, wsi_object = compute_from_patches(wsi_object=wsi_object, 
@@ -352,7 +352,7 @@ if __name__ == '__main__':
         #### check if pt_features_file exists ######
 
         ## Added
-        features_path_original = os.path.join(data_args.feature_dir_pt, slide_id+'.pt')
+        # features_path_original = os.path.join(data_args.feature_dir_pt, slide_id+'.pt')
 
         if not os.path.isfile(features_path):### Modified, original code : if not os.path.isfile(features_path):
             file = h5py.File(h5_path, "r")

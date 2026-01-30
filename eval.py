@@ -39,7 +39,7 @@ parser.add_argument('--fold', type=int, default=-1, help='single fold to evaluat
 parser.add_argument('--micro_average', action='store_true', default=False, 
                     help='use micro_average instead of macro_avearge for multiclass AUC')
 parser.add_argument('--split', type=str, choices=['train', 'val', 'test', 'all'], default='test')
-parser.add_argument('--task', type=str, choices=['task_1_tumor_vs_normal',  'task_2_tumor_subtyping'])
+parser.add_argument('--task', type=str, choices=['task_1_CCA_vs_HCC',  'task_2_tumor_subtyping'])
 parser.add_argument('--drop_out', type=float, default=0.25, help='dropout')
 parser.add_argument('--embed_dim', type=int, default=1024)
 args = parser.parse_args()
@@ -70,13 +70,13 @@ with open(args.save_dir + '/eval_experiment_{}.txt'.format(args.save_exp_code), 
 f.close()
 
 print(settings)
-if args.task == 'task_1_tumor_vs_normal':
+if args.task == 'task_1_CCA_vs_HCC':
     args.n_classes=2
-    dataset = Generic_MIL_Dataset(csv_path = 'dataset_csv/tumor_vs_normal_dummy_clean.csv',
-                            data_dir= os.path.join(args.data_root_dir, 'tumor_vs_normal_resnet_features'),
+    dataset = Generic_MIL_Dataset(csv_path = 'dataset_csv/CCA_vs_HCC.csv',
+                            data_dir= os.path.join(args.data_root_dir, 'features_ResNet'),
                             shuffle = False, 
                             print_info = True,
-                            label_dict = {'normal_tissue':0, 'tumor_tissue':1},
+                            label_dict = {'0':0, '1':1},
                             patient_strat=False,
                             ignore=[])
 
@@ -113,21 +113,26 @@ else:
     end = args.k_end
 
 if args.fold == -1:
-    folds = range(start, end)
+    # folds = range(start, end)
+    folds = range(9, 10)
 else:
     folds = range(args.fold, args.fold+1)
 ckpt_paths = [os.path.join(args.models_dir, 's_{}_checkpoint.pt'.format(fold)) for fold in folds]
+# datasets_id = {'train': 0, 'val': 1, 'test': 2, 'all': -1}
 datasets_id = {'train': 0, 'val': 1, 'test': 2, 'all': -1}
 
 if __name__ == "__main__":
     all_results = []
     all_auc = []
     all_acc = []
+    print('fold len :' +str(len(ckpt_paths)))
     for ckpt_idx in range(len(ckpt_paths)):
+        print('Evaluating fold {}'.format(folds[ckpt_idx]))
         if datasets_id[args.split] < 0:
             split_dataset = dataset
         else:
             csv_path = '{}/splits_{}.csv'.format(args.splits_dir, folds[ckpt_idx])
+            print(csv_path)
             datasets = dataset.return_splits(from_id=False, csv_path=csv_path)
             split_dataset = datasets[datasets_id[args.split]]
         model, patient_results, test_error, auc, df  = eval(split_dataset, args, ckpt_paths[ckpt_idx])

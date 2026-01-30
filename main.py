@@ -98,7 +98,7 @@ parser.add_argument('--model_type', type=str, choices=['clam_sb', 'clam_mb', 'mi
 parser.add_argument('--exp_code', type=str, help='experiment code for saving results')
 parser.add_argument('--weighted_sample', action='store_true', default=False, help='enable weighted sampling')
 parser.add_argument('--model_size', type=str, choices=['small', 'big'], default='small', help='size of model, does not affect mil')
-parser.add_argument('--task', type=str, choices=['task_1_CCA_vs_CHC',  'task_2_tumor_subtyping'])
+parser.add_argument('--task', type=str, choices=['task_1_CCA_vs_HCC',  'task_2_tumor_subtyping'])
 ### CLAM specific options
 parser.add_argument('--no_inst_cluster', action='store_true', default=False,
                      help='disable instance-level clustering')
@@ -152,16 +152,26 @@ if args.model_type in ['clam_sb', 'clam_mb']:
 
 print('\nLoad Dataset')
 
-if args.task == 'task_1_CCA_vs_CHC':
+if args.task == 'task_1_CCA_vs_HCC':
     args.n_classes=2
-    dataset = Generic_MIL_Dataset(csv_path = 'dataset_csv/CCA_vs_CHC_new.csv',
-                            data_dir= os.path.join(args.data_root_dir, 'features_224_AE'),
+    dataset = Generic_MIL_Dataset(csv_path = 'dataset_csv/CCA_vs_HCC_256_SimCLR_all.csv',
+                            data_dir= os.path.join(args.data_root_dir, 'features_ResNet_all'),
                             shuffle = False, 
                             seed = args.seed, 
                             print_info = True,
                             label_dict = {'0':0, '1':1},
                             patient_strat=False,
                             ignore=[])
+    
+    #show me all the batches of images for an epoch
+     
+    # for i in range(
+    #     len(dataset)
+    # ):
+    #     features, label = dataset[i]
+    #     pass
+    #     features, label = dataset[i]
+    #     print(f"Slide ID: {features}, Label: {label}")
 
 elif args.task == 'task_2_tumor_subtyping':
     args.n_classes=3
